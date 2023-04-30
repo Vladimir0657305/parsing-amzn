@@ -4,6 +4,10 @@ import Papa from 'papaparse';
 import './App.css';
 
 function App() {
+  const [fig, setFig] = useState({});
+  const [data, setData] = useState([]);
+  const [proxyData, setProxyData] = useState('');
+  const [error, setError] = useState(null);
   let paginator = undefined;
   let products = [];
   const [searchTerm, setSearchTerm] = useState('');
@@ -11,7 +15,7 @@ function App() {
   let hrefValuesArray = [];
 
   // const PROXY_URL = 'https://cors-anywhere.herokuapp.com/';
-  const PROXY_URL = 'https://api.allorigins.win/raw?url=';
+  const PROXY_URL = `https://api.allorigins.win/raw?url=`;
   const SEARCH_URL = `https://www.amazon.com/s?k=`;
   const NEXT_URL = `https://www.amazon.com`;
 
@@ -23,6 +27,16 @@ function App() {
     return response.data;
   };
 
+  const handleFileUpload = (event) => {
+    const file = event.target.files[0];
+
+    Papa.parse(file, {
+      header: true,
+      complete: (result) => {
+        setData(result.data);
+      }
+    });
+  };
 
   const handleSearchSubmit = async (event) => {
     event.preventDefault();
@@ -98,11 +112,34 @@ function App() {
     downloadLink.click();
   };
   return (
-    <div className="App">
+    <div className="app">
       <form onSubmit={handleSearchSubmit}>
         <input type="text" value={searchTerm} onChange={handleSearchTermChange} />
         <button type="submit">Parse Products</button>
       </form>
+      <input type="file" onChange={handleFileUpload} />
+      <table>
+        <thead>
+          <tr>
+            <th>asinValue</th>
+            <th>title</th>
+            <th>imageProduct</th>
+            <th>priceSymbol</th>
+            <th>price</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.map((row, index) => (
+            <tr key={index}>
+              <td>{row.asinValue}</td>
+              <td className='products_title'>{row.title}</td>
+              <td><img className='products_image' src={row.imageProduct} alt="Product" /></td>
+              <td className='products_symbol'>{row.priceSymbol}</td>
+              <td>{row.price}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
