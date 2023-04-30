@@ -1,0 +1,11 @@
+.products_image {
+  width: 200px;
+}
+
+.products_title {
+  width: 300px;
+}
+
+.products_symbol {
+  text-align: end;
+}
