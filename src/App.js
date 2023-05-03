@@ -43,19 +43,24 @@ function App() {
   const handleSearchSubmit = async (event) => {
     event.preventDefault();
     let index = 0;
-    while (index < 10) {
+    // while (index <= lastPage) {
+    while (index <= 2) {
       if (paginator === undefined) {
         const temp = `${PROXY_URL}${SEARCH_URL}${searchTerm}`;
         console.log(temp);
         let response = await fetchData(`${PROXY_URL}${SEARCH_URL}${searchTerm}`);
         products = parseProducts(response);
         index++;
+        paginator = index;
       } else {
         const delayTime = Math.floor(Math.random() * 3001) + 2000;
         await delay(delayTime);
+        const temp = `${PROXY_URL}${SEARCH_URL}${searchTerm}&page=${paginator}`;
+        console.log(temp);
         let response = await fetchData(`${PROXY_URL}${SEARCH_URL}${searchTerm}&page=${paginator}`);
         products = parseProducts(response);
         index++;
+        paginator = index;
       }
     }
     downloadCsv(products);
@@ -71,16 +76,15 @@ function App() {
     console.log(doc);
 
     let linkValue = doc.querySelectorAll('.s-pagination-container .s-pagination-disabled');
-    if(paginator == undefined) {
+    console.log(linkValue);
+    if(paginator === undefined) {
       lastPage = linkValue[linkValue.length - 1].textContent;
     }
-    
-    
-    // let link = doc.querySelector('li.a-last > a');
     console.log('LASTPAGE=>', lastPage);
-    let temp = link?.href.replace(valueToRemove, '');
-    paginator = temp;
-    console.log('paginator=', paginator);
+    // let link = doc.querySelector('li.a-last > a');
+    // let temp = link?.href.replace(valueToRemove, '');
+    // paginator = temp;
+    // console.log('paginator=', paginator);
 
     doc.querySelectorAll('div[data-component-type="s-search-result"]').forEach((item) => {
       // console.log(item);
@@ -97,7 +101,7 @@ function App() {
       // price = parseFloat(`${priceWhole}.${priceFraction}`).toFixed(2);
       // }
       const price = priceWhole && priceFraction ? `${priceWhole}${priceFraction}` : "0";
-
+      console.log(asinValue, title, imageProduct, priceSymbol, price);
       products.push({ asinValue, title, imageProduct, priceSymbol, price });
     });
 
