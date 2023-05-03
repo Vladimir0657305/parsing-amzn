@@ -13,8 +13,6 @@ function App() {
   const [searchTerm, setSearchTerm] = useState('');
   const valueToRemove = 'http://localhost:3000';
   let hrefValuesArray = [];
-  let link = 0;
-  let lastPage = 0;
 
   // const PROXY_URL = 'https://cors-anywhere.herokuapp.com/';
   const PROXY_URL = `https://api.allorigins.win/raw?url=`;
@@ -53,13 +51,22 @@ function App() {
       } else {
         const delayTime = Math.floor(Math.random() * 3001) + 2000;
         await delay(delayTime);
-        let response = await fetchData(`${PROXY_URL}${SEARCH_URL}${searchTerm}&page=${paginator}`);
-        products = parseProducts(response);
+        await nextSearch();
         index++;
       }
     }
     downloadCsv(products);
   };
+
+  const nextSearch = async () => {
+    let t = `${PROXY_URL}${NEXT_URL}${paginator}`;
+    console.log('000000000=', t);
+    const response = await fetchData(`${PROXY_URL}${NEXT_URL}${paginator}`);
+    products = parseProducts(response);
+    console.log('2222=', products);
+
+  };
+
 
   const handleSearchTermChange = (event) => {
     setSearchTerm(event.target.value);
@@ -71,13 +78,10 @@ function App() {
     console.log(doc);
 
     let linkValue = doc.querySelectorAll('.s-pagination-container .s-pagination-disabled');
-    if(paginator == undefined) {
-      lastPage = linkValue[linkValue.length - 1].textContent;
-    }
-    
+    let link = linkValue[linkValue.length - 1].textContent;
     
     // let link = doc.querySelector('li.a-last > a');
-    console.log('LASTPAGE=>', lastPage);
+    console.log('LINK=', link);
     let temp = link?.href.replace(valueToRemove, '');
     paginator = temp;
     console.log('paginator=', paginator);
