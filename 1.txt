@@ -1,0 +1,39 @@
+Код, который вы предоставили, является кодом Node.js, который можно использовать для создания веб-серверов с помощью Firebase Cloud Functions. Если вы хотите использовать этот код в своем приложении React, вам необходимо сделать несколько шагов:
+
+Установите Firebase SDK в свой проект React с помощью npm:
+
+npm install firebase
+
+Импортируйте нужные модули из Firebase SDK в свой компонент React:
+
+import firebase from "firebase/app";
+import "firebase/functions";
+
+Инициализируйте Firebase в своем компоненте React:
+
+firebase.initializeApp({
+  // здесь вы должны вставить настройки вашего проекта Firebase
+});
+
+
+Вызовите функцию Cloud Functions с помощью SDK Firebase в своем компоненте React:
+
+const onScraperComplete = firebase.functions().httpsCallable("onScraperComplete");
+
+const handleClick = async () => {
+  try {
+    const response = await onScraperComplete({ data: "test" });
+    console.log(response.data);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+return (
+  <div>
+    <button onClick={handleClick}>Нажми меня</button>
+  </div>
+);
+
+Замените настройки Firebase в инициализации в соответствии с вашим проектом Firebase. Обратите внимание, что вы можете передать данные в функцию Cloud Functions с помощью объекта в методе onScraperComplete. Эти данные будут доступны в request.body в вашем обработчике Cloud Functions.
+

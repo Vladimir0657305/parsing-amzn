@@ -16,32 +16,10 @@ function App() {
   let link = 0;
   let lastPage = 0;
 
-    const PROXY_URL = `https://api.allorigins.win/raw?url=`;
+  // const PROXY_URL = 'https://cors-anywhere.herokuapp.com/';
+  const PROXY_URL = `https://api.allorigins.win/raw?url=`;
   const SEARCH_URL = `https://www.amazon.com/s?k=`;
   const NEXT_URL = `https://www.amazon.com`;
-
-
-
-  const fetchResults = async (searchTerm) => {
-    const api_key = process.env.BRIGHTDATA_API_KEY;
-    const url = `https://api.brightdata.com/fiddler/direct?id=your_session_id&url=${encodeURIComponent(`https://www.amazon.com/s?k=${searchTerm}`)}`;
-
-    const res = await fetch(url, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${api_key}`,
-      },
-    });
-    const data = await res.json();
-    if (data.status === "building" || data.status === "collecting") {
-      // console.log("NOT COMPLETE YET, TRY AGAIN...");
-      return fetchResults(id);
-    }
-    return data;
-  };
-
-
-
 
 
   const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
