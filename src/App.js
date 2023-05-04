@@ -43,8 +43,8 @@ function App() {
   const handleSearchSubmit = async (event) => {
     event.preventDefault();
     let index = 0;
-    // while (index <= lastPage) {
-    while (index <= 2) {
+    while (index <= lastPage) {
+    // while (index <= 2) {
       if (paginator === undefined) {
         const temp = `${PROXY_URL}${SEARCH_URL}${searchTerm}`;
         console.log(temp);
@@ -77,7 +77,7 @@ function App() {
 
     let linkValue = doc.querySelectorAll('.s-pagination-container .s-pagination-disabled');
     console.log(linkValue);
-    if(paginator === undefined) {
+    if (paginator === undefined) {
       lastPage = linkValue[linkValue.length - 1].textContent;
     }
     console.log('LASTPAGE=>', lastPage);
@@ -122,7 +122,7 @@ function App() {
         <button type="submit">Parse Products</button>
       </form>
       <input type="file" onChange={handleFileUpload} />
-      <table>
+      <table className='tabl'>
         <thead>
           <tr>
             <th>asinValue</th>
