@@ -1,57 +1,55 @@
 import React, { useState } from 'react';
-import fetch from 'node-fetch';
-import dotenv from 'dotenv';
-import HttpsProxyAgent from 'https-proxy-agent';
 import axios from 'axios';
 import Papa from 'papaparse';
 import './App.css';
 
-dotenv.config();
-
-
-
-
 function App() {
+    const [fig, setFig] = useState({});
     const [data, setData] = useState([]);
+    const [proxyData, setProxyData] = useState('');
+    const [error, setError] = useState(null);
     let paginator = undefined;
     let products = [];
     const [searchTerm, setSearchTerm] = useState('');
+    const valueToRemove = 'http://localhost:3000';
+    let hrefValuesArray = [];
     let link = 0;
     let lastPage = 0;
 
-    async function rotateWithBrightData() {
-        // const url = 'https://lumtest.com/myip.json';
-        const url = `https://www.amazon.com/s?k=${searchTerm}`;
+    const PROXY_URL = `https://api.allorigins.win/raw?url=`;
+    const SEARCH_URL = `https://www.amazon.com/s?k=`;
+    const NEXT_URL = `https://www.amazon.com`;
 
-        // const response = await fetch(url, {
-        // agent: new HttpsProxyAgent.HttpsProxyAgent(`https://${process.env.luminatiUsername}-session-rand${Math.ceil(Math.random() * 10000000)}:${process.env.luminatiPassword}@zproxy.lum-superproxy.io:22225`)
-        // agent: new HttpsProxyAgent.HttpsProxyAgent(`https://${process.env.luminatiUsername}-session-rand7:${process.env.luminatiPassword}@zproxy.lum-superproxy.io:22225`)
-        // });
-        if (paginator == 0) {
-            const url = `https://www.amazon.com/s?k=${searchTerm}`;
-            const response = await fetch(url, {
-                agent: new HttpsProxyAgent.HttpsProxyAgent(`https://${process.env.luminatiUsername}-session-rand${Math.ceil(Math.random() * 10000000)}:${process.env.luminatiPassword}@zproxy.lum-superproxy.io:22225`)
-            });
-        } else {
-            const url = `https://www.amazon.com/s?k=${searchTerm}&page=${paginator}`;
-            const response = await fetch(url, {
-                agent: new HttpsProxyAgent.HttpsProxyAgent(`https://${process.env.luminatiUsername}-session-rand${Math.ceil(Math.random() * 10000000)}:${process.env.luminatiPassword}@zproxy.lum-superproxy.io:22225`)
-            });
+
+
+    const fetchResults = async (searchTerm) => {
+        const api_key = process.env.BRIGHTDATA_API_KEY;
+        const url = `https://api.brightdata.com/fiddler/direct?id=your_session_id&url=${encodeURIComponent(`https://www.amazon.com/s?k=${searchTerm}`)}`;
+
+        const res = await fetch(url, {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${api_key}`,
+            },
+        });
+        const data = await res.json();
+        if (data.status === "building" || data.status === "collecting") {
+            // console.log("NOT COMPLETE YET, TRY AGAIN...");
+            return fetchResults(id);
         }
-        // const html = await response.text();
-        const html = await response();
-        return html;
-
-        // const json = await response.json();
-        // console.log('json', json);
+        return data;
     };
+
+
+
+
 
     const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-    // const fetchData = async (url) => {
-    //     const response = await axios.get(url);
-    //     return response.data;
-    // };
+    const fetchData = async (url) => {
+        const response = await axios.get(url);
+        return response.data;
+    };
 
     const handleFileUpload = (event) => {
         const file = event.target.files[0];
@@ -70,22 +68,18 @@ function App() {
         while (index <= lastPage) {
             // while (index <= 2) {
             if (paginator === undefined) {
-                let response = rotateWithBrightData().then(html => {
-                    console.log(html);
-                }).catch(error => {
-                    console.error(error);
-                });
+                const temp = `${PROXY_URL}${SEARCH_URL}${searchTerm}`;
+                console.log(temp);
+                let response = await fetchData(`${PROXY_URL}${SEARCH_URL}${searchTerm}`);
                 products = parseProducts(response);
                 index++;
                 paginator = index;
             } else {
-                // const delayTime = Math.floor(Math.random() * 3001) + 2000;
-                // await delay(delayTime);
-                let response = rotateWithBrightData().then(html => {
-                    console.log(html);
-                }).catch(error => {
-                    console.error(error);
-                });
+                const delayTime = Math.floor(Math.random() * 3001) + 2000;
+                await delay(delayTime);
+                const temp = `${PROXY_URL}${SEARCH_URL}${searchTerm}&page=${paginator}`;
+                console.log(temp);
+                let response = await fetchData(`${PROXY_URL}${SEARCH_URL}${searchTerm}&page=${paginator}`);
                 products = parseProducts(response);
                 index++;
                 paginator = index;
@@ -109,6 +103,10 @@ function App() {
             lastPage = linkValue[linkValue.length - 1].textContent;
         }
         console.log('LASTPAGE=>', lastPage);
+        // let link = doc.querySelector('li.a-last > a');
+        // let temp = link?.href.replace(valueToRemove, '');
+        // paginator = temp;
+        // console.log('paginator=', paginator);
 
         doc.querySelectorAll('div[data-component-type="s-search-result"]').forEach((item) => {
             // console.log(item);
